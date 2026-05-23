@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: churnai-frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: churnai-frontend
+  template:
+    metadata:
+      labels:
+        app: churnai-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: churnai-frontend:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NEXT_PUBLIC_API_URL
+              value: "http://churnai-backend-svc:8000"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: churnai-frontend-svc
+spec:
+  selector:
+    app: churnai-frontend
+  ports:
+    - port: 3000
+      targetPort: 3000

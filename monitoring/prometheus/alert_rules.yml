@@ -1,0 +1,28 @@
+groups:
+  - name: churnai_alerts
+    rules:
+      - alert: HighChurnPredictionRate
+        expr: rate(churnai_predictions_total{risk_category="high"}[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High churn prediction rate detected"
+          description: "More than 10 high-risk predictions per minute in the last 2 minutes."
+
+      - alert: ModelDriftDetected
+        expr: churnai_drift_score > 0.1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Model drift detected"
+          description: "Drift score exceeds threshold of 0.1."
+
+      - alert: BackendDown
+        expr: up{job="churnai-backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "ChurnAI backend is down"
