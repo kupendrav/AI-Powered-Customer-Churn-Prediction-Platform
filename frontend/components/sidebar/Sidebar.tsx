@@ -27,6 +27,7 @@ export default function Sidebar({ onLogout, userName = "User", userRole = "analy
       width: 220, minHeight: "100vh", background: "var(--surface-card)",
       borderRight: "1px solid var(--surface-border)",
       display: "flex", flexDirection: "column", flexShrink: 0,
+      boxShadow: "8px 0 24px rgba(15, 23, 42, 0.04)",
     }}>
       {/* Logo */}
       <div style={{ padding: "1.25rem 1.25rem 1rem", borderBottom: "1px solid var(--surface-border)" }}>
@@ -47,7 +48,8 @@ export default function Sidebar({ onLogout, userName = "User", userRole = "analy
               fontSize: "0.875rem", fontWeight: active ? 500 : 400,
               color: active ? "var(--brand-light)" : "var(--text-secondary)",
               background: active ? "var(--brand-dim)" : "transparent",
-              borderLeft: active ? "2px solid var(--brand)" : "2px solid transparent",
+              border: active ? "1px solid rgba(47,91,255,0.22)" : "1px solid transparent",
+              borderLeft: active ? "3px solid var(--brand)" : "3px solid transparent",
               transition: "all 0.15s",
             }}>
               <Icon size={16} />

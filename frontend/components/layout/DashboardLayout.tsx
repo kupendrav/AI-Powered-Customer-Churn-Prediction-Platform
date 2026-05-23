@@ -8,7 +8,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
       <Sidebar onLogout={logout} userName={user?.full_name ?? user?.email ?? "User"} userRole={user?.role} />
-      <main style={{ flex: 1, overflow: "auto", padding: "2rem" }}>
+      <main style={{ flex: 1, overflow: "auto", padding: "2rem", scrollbarWidth: "none", msOverflowStyle: "none" }}>
         {children}
       </main>
     </div>

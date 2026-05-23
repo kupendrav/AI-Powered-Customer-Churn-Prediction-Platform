@@ -1,145 +1,308 @@
 "use client";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { TrendingUp, Shield, Zap, BarChart3, Brain, AlertTriangle } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowRight,
+  BarChart3,
+  Brain,
+  CheckCircle2,
+  LineChart,
+  Shield,
+  TrendingUp,
+  Zap,
+} from "lucide-react";
 
 const features = [
-  { icon: Brain, title: "AI Churn Prediction", desc: "Random Forest, XGBoost, LightGBM ensemble with SMOTE balancing and SHAP explanations." },
-  { icon: Shield, title: "Risk Scoring", desc: "Per-customer risk scores with top contributing factors and confidence levels." },
-  { icon: TrendingUp, title: "Revenue Intelligence", desc: "MRR at risk, CLV analysis, and estimated revenue saved per retention action." },
-  { icon: Zap, title: "Smart Recommendations", desc: "AI-generated retention strategies ranked by impact and estimated ROI." },
-  { icon: BarChart3, title: "EDA Dashboards", desc: "Interactive charts: churn by segment, cohort analysis, correlation heatmaps." },
-  { icon: AlertTriangle, title: "Drift Monitoring", desc: "Evidently-powered data and concept drift detection with Grafana alerts." },
+  { icon: Brain, title: "AI Churn Prediction", desc: "Model-backed churn probability with clear risk categories for every customer." },
+  { icon: Shield, title: "Explainable Risk", desc: "Business-readable factors show why an account is likely to leave." },
+  { icon: TrendingUp, title: "Revenue Intelligence", desc: "Track churn rate, MRR at risk, CLV, NPS, and retention impact." },
+  { icon: Zap, title: "Retention Actions", desc: "Generate next-best actions for customer success and revenue teams." },
+  { icon: BarChart3, title: "Segment Analytics", desc: "Compare churn across regions, plans, contracts, and payment methods." },
+  { icon: AlertTriangle, title: "Model Monitoring", desc: "Monitor metrics and drift so AI quality stays visible over time." },
+];
+
+const stats = [
+  ["110k", "customer records loaded"],
+  ["0.816", "ROC AUC baseline"],
+  ["8/8", "backend tests passing"],
+  ["Docker", "full stack runtime"],
+];
+
+const workflow = [
+  "Upload customer behavior data",
+  "Score churn probability",
+  "Explain risk drivers",
+  "Recommend retention actions",
 ];
 
 export default function LandingPage() {
   return (
-    <main style={{ minHeight: "100vh", background: "var(--surface-bg)" }}>
-      {/* Nav */}
+    <main style={{ minHeight: "100vh", background: "linear-gradient(180deg, #f8fafc 0%, #eef3ff 52%, #f8fafc 100%)" }}>
       <nav style={{
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "1rem 2rem", borderBottom: "1px solid #fff",
-        position: "sticky", top: 0, background: "rgba(11,15,26,0.85)",
-        backdropFilter: "blur(12px)", zIndex: 50,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: "1rem",
+        padding: "0.85rem clamp(1rem, 4vw, 2.5rem)",
+        borderBottom: "1px solid rgba(15, 23, 42, 0.12)",
+        boxShadow: "0 1px 0 rgba(255,255,255,0.85) inset, 0 8px 24px rgba(15,23,42,0.06)",
+        position: "sticky",
+        top: 0,
+        background: "rgba(255,255,255,0.88)",
+        backdropFilter: "blur(14px)",
+        zIndex: 50,
       }}>
-        <span style={{ fontSize: "1.25rem", fontWeight: 600, color: "#fff" }}>
-          Churn<span style={{ color: "#fff" }}>AI</span>
-        </span>
-        <div style={{ display: "flex", gap: "1rem" }}>
+        <Link href="/" style={{ display: "flex", alignItems: "center", gap: "0.65rem", textDecoration: "none" }}>
+          <span style={{
+            width: 34,
+            height: 34,
+            borderRadius: 8,
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "var(--brand)",
+            color: "#fff",
+            border: "1px solid rgba(15,23,42,0.12)",
+            boxShadow: "0 8px 18px rgba(47,91,255,0.24)",
+          }}>
+            <LineChart size={18} />
+          </span>
+          <span style={{ display: "flex", flexDirection: "column", lineHeight: 1.05 }}>
+            <strong style={{ fontSize: "1.05rem", color: "var(--text-primary)" }}>ChurnAI</strong>
+            <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>Retention Intelligence</span>
+          </span>
+        </Link>
+
+        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", flexWrap: "wrap", justifyContent: "flex-end" }}>
           <Link href="/login" style={{
-            padding: "0.45rem 1.2rem", borderRadius: 8, border: "1px solid #fff",
-            color: "#fff", textDecoration: "none", fontSize: "0.875rem",
+            padding: "0.55rem 1rem",
+            borderRadius: 8,
+            border: "1px solid rgba(15,23,42,0.16)",
+            background: "#fff",
+            color: "var(--text-primary)",
+            textDecoration: "none",
+            fontSize: "0.875rem",
+            fontWeight: 600,
+            boxShadow: "0 1px 2px rgba(15,23,42,0.04)",
           }}>Sign in</Link>
-          <Link href="/register" style={{
-            padding: "0.45rem 1.2rem", borderRadius: 8,
-            background: "var(--brand)", color: "#fff",
-            textDecoration: "none", fontSize: "0.875rem", fontWeight: 500,
-          }}>Get started</Link>
+          <Link href="/dashboard" style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.45rem",
+            padding: "0.55rem 1rem",
+            borderRadius: 8,
+            border: "1px solid rgba(47,91,255,0.35)",
+            background: "var(--brand)",
+            color: "#fff",
+            textDecoration: "none",
+            fontSize: "0.875rem",
+            fontWeight: 600,
+            boxShadow: "0 10px 24px rgba(47,91,255,0.22)",
+          }}>
+            Dashboard <ArrowRight size={15} />
+          </Link>
         </div>
       </nav>
 
-      {/* Hero */}
-      <section style={{ textAlign: "center", padding: "6rem 2rem 4rem" }}>
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
+      <section style={{
+        maxWidth: 1180,
+        margin: "0 auto",
+        padding: "clamp(3rem, 7vw, 5.5rem) clamp(1rem, 4vw, 2rem) 3rem",
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+        gap: "2rem",
+        alignItems: "center",
+      }}>
+        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }}>
           <span style={{
-            display: "inline-block", padding: "4px 14px", borderRadius: 999,
-            background: "var(--brand-dim)", color: "var(--brand-light)",
-            fontSize: "0.75rem", fontWeight: 500, letterSpacing: "0.06em",
-            marginBottom: "1.5rem", border: "1px solid rgba(79,110,247,0.3)",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.45rem",
+            padding: "0.45rem 0.75rem",
+            borderRadius: 8,
+            background: "#fff",
+            color: "var(--brand)",
+            fontSize: "0.78rem",
+            fontWeight: 700,
+            border: "1px solid rgba(47,91,255,0.22)",
+            boxShadow: "0 6px 18px rgba(15,23,42,0.05)",
+            marginBottom: "1.2rem",
           }}>
-            ENTERPRISE AI PLATFORM
+            <CheckCircle2 size={15} /> ENTERPRISE AI RETENTION PLATFORM
           </span>
+
           <h1 style={{
-            fontSize: "clamp(2.5rem, 6vw, 4rem)", fontWeight: 700,
-            lineHeight: 1.1, letterSpacing: "-0.03em", margin: "0 0 1.5rem",
+            fontSize: "clamp(2.45rem, 6vw, 4.6rem)",
+            fontWeight: 800,
+            lineHeight: 1.02,
+            margin: "0 0 1.25rem",
+            color: "#0f172a",
           }}>
-            Predict churn before<br />
-            <span style={{ color: "var(--brand-light)" }}>customers leave</span>
+            Predict churn before customers leave.
           </h1>
+
           <p style={{
-            fontSize: "1.125rem", color: "var(--text-secondary)", maxWidth: 540,
-            margin: "0 auto 2.5rem", lineHeight: 1.7,
+            fontSize: "1.08rem",
+            color: "var(--text-secondary)",
+            maxWidth: 610,
+            margin: "0 0 1.8rem",
+            lineHeight: 1.75,
           }}>
-            ML-powered retention intelligence with explainable AI, real-time risk scoring,
-            and automated retention recommendations.
+            ChurnAI turns customer behavior into revenue intelligence: risk scores, model metrics,
+            explainable drivers, and retention recommendations in one operational dashboard.
           </p>
-          <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
+
+          <div style={{ display: "flex", gap: "0.8rem", flexWrap: "wrap" }}>
             <Link href="/dashboard" style={{
-              padding: "0.75rem 2rem", borderRadius: 10,
-              background: "var(--brand)", color: "#fff",
-              textDecoration: "none", fontWeight: 500, fontSize: "1rem",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              padding: "0.8rem 1.25rem",
+              borderRadius: 8,
+              border: "1px solid rgba(47,91,255,0.35)",
+              background: "var(--brand)",
+              color: "#fff",
+              textDecoration: "none",
+              fontWeight: 700,
+              boxShadow: "0 14px 30px rgba(47,91,255,0.25)",
             }}>
-              View Dashboard →
+              View dashboard <ArrowRight size={17} />
             </Link>
             <Link href="/login" style={{
-              padding: "0.75rem 2rem", borderRadius: 10,
-              border: "1px solid var(--surface-border)",
-              color: "var(--text-secondary)", textDecoration: "none", fontSize: "1rem",
+              padding: "0.8rem 1.25rem",
+              borderRadius: 8,
+              border: "1px solid rgba(15,23,42,0.16)",
+              background: "#fff",
+              color: "var(--text-primary)",
+              textDecoration: "none",
+              fontWeight: 700,
             }}>
               Sign in
             </Link>
           </div>
         </motion.div>
-      </section>
 
-      {/* Stats bar */}
-      <section style={{
-        display: "flex", justifyContent: "center", gap: "3rem", flexWrap: "wrap",
-        padding: "2rem", borderTop: "1px solid var(--surface-border)",
-        borderBottom: "1px solid var(--surface-border)",
-      }}>
-        {[["100k+", "Synthetic records"], ["4", "ML models"], ["SHAP", "Explainability"], ["Real-time", "Drift alerts"]].map(([val, label]) => (
-          <div key={label} style={{ textAlign: "center" }}>
-            <div style={{ fontSize: "1.75rem", fontWeight: 700, color: "var(--brand-light)" }}>{val}</div>
-            <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: 2 }}>{label}</div>
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, delay: 0.1 }}
+          style={{
+            background: "#fff",
+            border: "1px solid rgba(15,23,42,0.14)",
+            borderRadius: 8,
+            boxShadow: "0 22px 60px rgba(15,23,42,0.12)",
+            overflow: "hidden",
+          }}
+        >
+          <div style={{
+            padding: "0.85rem 1rem",
+            borderBottom: "1px solid rgba(15,23,42,0.1)",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            background: "#f8fafc",
+          }}>
+            <strong style={{ color: "#0f172a", fontSize: "0.95rem" }}>Revenue Risk Snapshot</strong>
+            <span style={{ color: "#047857", fontSize: "0.78rem", fontWeight: 700 }}>Live model</span>
           </div>
-        ))}
+
+          <div style={{ padding: "1rem", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem" }}>
+            {stats.map(([value, label]) => (
+              <div key={label} style={{
+                border: "1px solid rgba(15,23,42,0.12)",
+                borderRadius: 8,
+                padding: "1rem",
+                background: "#fff",
+              }}>
+                <div style={{ color: "var(--brand)", fontSize: "1.55rem", fontWeight: 800, lineHeight: 1 }}>{value}</div>
+                <div style={{ color: "var(--text-muted)", fontSize: "0.78rem", marginTop: "0.45rem" }}>{label}</div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ padding: "0 1rem 1rem" }}>
+            <div style={{
+              border: "1px solid rgba(15,23,42,0.12)",
+              borderRadius: 8,
+              padding: "1rem",
+              background: "linear-gradient(135deg, rgba(47,91,255,0.08), rgba(16,185,129,0.08))",
+            }}>
+              {workflow.map((item, index) => (
+                <div key={item} style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.55rem 0" }}>
+                  <span style={{
+                    width: 24,
+                    height: 24,
+                    borderRadius: 8,
+                    background: "#fff",
+                    border: "1px solid rgba(47,91,255,0.2)",
+                    color: "var(--brand)",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "0.78rem",
+                    fontWeight: 800,
+                  }}>{index + 1}</span>
+                  <span style={{ color: "var(--text-primary)", fontSize: "0.92rem", fontWeight: 600 }}>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
       </section>
 
-      {/* Features */}
-      <section style={{ maxWidth: 1100, margin: "0 auto", padding: "5rem 2rem" }}>
-        <h2 style={{ textAlign: "center", fontSize: "1.75rem", fontWeight: 600, marginBottom: "3rem" }}>
-          Everything you need to retain customers
-        </h2>
+      <section style={{
+        maxWidth: 1180,
+        margin: "0 auto",
+        padding: "0 clamp(1rem, 4vw, 2rem) 4rem",
+      }}>
         <div style={{
-          display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          gap: "1.25rem",
+          border: "1px solid rgba(15,23,42,0.12)",
+          borderRadius: 8,
+          background: "rgba(255,255,255,0.9)",
+          boxShadow: "0 14px 34px rgba(15,23,42,0.06)",
+          padding: "1rem",
         }}>
-          {features.map(({ icon: Icon, title, desc }) => (
-            <motion.div
-              key={title}
-              whileHover={{ y: -4 }}
-              style={{
-                background: "var(--surface-card)", border: "1px solid var(--surface-border)",
-                borderRadius: 12, padding: "1.5rem",
-              }}
-            >
-              <div style={{
-                width: 40, height: 40, borderRadius: 10,
-                background: "var(--brand-dim)", display: "flex",
-                alignItems: "center", justifyContent: "center", marginBottom: "1rem",
-              }}>
-                <Icon size={20} color="var(--brand-light)" />
-              </div>
-              <h3 style={{ margin: "0 0 0.5rem", fontSize: "1rem", fontWeight: 600 }}>{title}</h3>
-              <p style={{ margin: 0, fontSize: "0.875rem", color: "var(--text-secondary)", lineHeight: 1.6 }}>{desc}</p>
-            </motion.div>
-          ))}
+          <h2 style={{ margin: "0 0 1rem", fontSize: "1.3rem", color: "#0f172a" }}>
+            Everything needed to retain customers
+          </h2>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+            gap: "0.9rem",
+          }}>
+            {features.map(({ icon: Icon, title, desc }) => (
+              <motion.div
+                key={title}
+                whileHover={{ y: -3 }}
+                style={{
+                  background: "#fff",
+                  border: "1px solid rgba(15,23,42,0.12)",
+                  borderRadius: 8,
+                  padding: "1rem",
+                  minHeight: 158,
+                }}
+              >
+                <div style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: 8,
+                  background: "var(--brand-dim)",
+                  border: "1px solid rgba(47,91,255,0.18)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginBottom: "0.9rem",
+                }}>
+                  <Icon size={19} color="var(--brand)" />
+                </div>
+                <h3 style={{ margin: "0 0 0.45rem", fontSize: "0.98rem", fontWeight: 800, color: "#0f172a" }}>{title}</h3>
+                <p style={{ margin: 0, fontSize: "0.86rem", color: "var(--text-secondary)", lineHeight: 1.6 }}>{desc}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer style={{
-        textAlign: "center", padding: "2rem",
-        borderTop: "1px solid var(--surface-border)",
-        color: "var(--text-muted)", fontSize: "0.8rem",
-      }}>
-        ChurnAI Platform © 2025 · MIT License
-      </footer>
     </main>
   );
 }
