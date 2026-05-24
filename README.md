@@ -10,6 +10,7 @@ Unlike traditional churn tools that only identify “customers likely to leave,�
 <video width="100%" controls muted autoplay loop>
   <source src="./docs/assets/churn-platform-demo.mp4" type="video/mp4">
 </video>
+
 # Executive Business Overview
 
 Modern B2B SaaS companies lose between **15%–30% of annual recurring revenue (ARR)** due to preventable churn, poor onboarding, unresolved support friction, declining engagement, and lack of retention intelligence.
