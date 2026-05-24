@@ -8,11 +8,12 @@ Unlike traditional churn tools that only identify â€œcustomers likely to leave,â
 
 ---
 <iframe
-  src="https://drive.google.com/file/d/1-pT5lluvWnnlLqtlDmUCIPjfx48mrPjb/preview?autoplay=1&mute=1"
+  src="docs/assets/video-player.html"
   title="AI-Powered Customer Churn Prediction Platform Demo"
-  width="1280"
+  width="1080"
   height="720"
   allow="autoplay; fullscreen"
+  muted
   allowfullscreen>
 </iframe>
 
