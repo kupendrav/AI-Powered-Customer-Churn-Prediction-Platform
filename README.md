@@ -7,7 +7,14 @@ Built for high-growth AI SaaS companies like [Typewise](https://www.typewise.ai?
 Unlike traditional churn tools that only identify “customers likely to leave,” this platform acts as an operational intelligence layer that continuously analyzes customer behavior, predicts retention risks, explains revenue leakage, and recommends proactive interventions before churn impacts ARR.
 
 ---
-<video controls src="Recording 2026-05-24 115013.mp4" title="video-demonstration" width="1280" height="720" autoplay muted playsinline ></video>
+<iframe
+  src="https://drive.google.com/file/d/1-pT5lluvWnnlLqtlDmUCIPjfx48mrPjb/preview?autoplay=1&mute=1"
+  title="AI-Powered Customer Churn Prediction Platform Demo"
+  width="1280"
+  height="720"
+  allow="autoplay; fullscreen"
+  allowfullscreen>
+</iframe>
 
 # Executive Business Overview
 
