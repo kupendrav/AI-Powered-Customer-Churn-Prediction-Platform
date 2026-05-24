@@ -2,11 +2,15 @@
 
 ### Enterprise Revenue Intelligence Engine for AI-First Customer Experience Companies
 
-Built for high-growth AI SaaS companies like [Typewise](https://www.typewise.ai?utm_source=chatgpt.com), this platform transforms customer churn prediction from a technical ML dashboard into a measurable revenue protection and customer expansion system.
+Built for high-growth AI SaaS companies like [Typewise](https://www.typewise.ai?utm_source=chatgpt.com), this platform transforms customer churn prediction from a technical ML dashboard into a measurable business asset.
 
-Unlike traditional churn tools that only identify “customers likely to leave,” this platform acts as an operational intelligence layer that continuously analyzes customer behavior, predicts retention risks, explains revenue leakage, and recommends proactive interventions before churn impacts ARR.
+Unlike traditional churn tools that only identify “customers likely to leave,” this platform acts as an operational intelligence layer that continuously analyzes customer behavior, predicts retention risks, and offers actionable guidance for revenue teams.
 
 ---
+
+[▶️ Watch the Platform Demo](docs/assets/video-player.html)
+
+<!-- Local HTML preview for Markdown renderers that support HTML, but not on github.com -->
 <iframe
   src="docs/assets/video-player.html"
   title="AI-Powered Customer Churn Prediction Platform Demo"
@@ -21,7 +25,7 @@ Unlike traditional churn tools that only identify “customers likely to leave,�
 
 Modern B2B SaaS companies lose between **15%–30% of annual recurring revenue (ARR)** due to preventable churn, poor onboarding, unresolved support friction, declining engagement, and lack of retention intelligence.
 
-For AI-native customer service platforms like [Typewise](https://www.typewise.ai?utm_source=chatgpt.com) — where enterprise contracts, customer satisfaction, and operational efficiency directly impact expansion revenue — reducing churn by even a small percentage creates a significant financial advantage.
+For AI-native customer service platforms like [Typewise](https://www.typewise.ai?utm_source=chatgpt.com) — where enterprise contracts, customer satisfaction, and operational efficiency directly impact growth and valuation — customer retention is everything.
 
 This platform was designed specifically for:
 
