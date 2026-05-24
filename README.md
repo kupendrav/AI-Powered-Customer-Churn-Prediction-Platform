@@ -8,18 +8,14 @@ Unlike traditional churn tools that only identify “customers likely to leave,�
 
 ---
 
-[▶️ Watch the Platform Demo](docs/assets/video-player.html)
+## ▶️ Watch the Platform Demo
 
-<!-- Local HTML preview for Markdown renderers that support HTML, but not on github.com -->
-<iframe
-  src="docs/assets/video-player.html"
-  title="AI-Powered Customer Churn Prediction Platform Demo"
-  width="1080"
-  height="720"
-  allow="autoplay; fullscreen"
-  muted
-  allowfullscreen>
-</iframe>
+[▶️ Watch the Platform Demo](docs/assets/demo.mp4)
+
+<!-- For local Markdown previewers/supporting HTML below: -->
+<video src="docs/assets/demo.mp4" controls autoplay muted width="720" height="405" style="max-width:100%;border-radius:8px;">
+  Your browser does not support the video tag.
+</video>
 
 # Executive Business Overview
 
