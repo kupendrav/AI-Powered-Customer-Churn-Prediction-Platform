@@ -12,6 +12,7 @@ from app.dependencies import get_current_user
 from app.services.prediction_service import PredictionService
 
 router = APIRouter()
+prediction_service = PredictionService()
 
 
 @router.post("/predict", response_model=PredictionResponse)
@@ -20,8 +21,10 @@ async def predict_single(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    service = PredictionService()
-    result = service.predict_single(payload.model_dump())
+    try:
+        result = prediction_service.predict_single(payload.model_dump())
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail="Prediction model inference failed") from exc
 
     prediction = Prediction(
         customer_id=payload.customer_id,
@@ -49,8 +52,10 @@ async def predict_batch(
     content = await file.read()
     df = pd.read_csv(io.StringIO(content.decode("utf-8")))
 
-    service = PredictionService()
-    results = service.predict_batch(df)
+    try:
+        results = prediction_service.predict_batch(df)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail="Prediction model inference failed") from exc
 
     for r in results:
         db.add(Prediction(

@@ -12,6 +12,9 @@ from app.main import app
 from app.db.base import Base
 from app.db.session import get_db
 from app.models.user import User, UserRole
+from app.models.customer import Customer
+from app.models.prediction import Prediction
+from app.models.recommendation import Recommendation
 from app.core.security import hash_password
 
 SQLALCHEMY_TEST_URL = "sqlite://"
@@ -86,6 +89,16 @@ class TestAuth:
         })
         assert r.status_code == 201
 
+    def test_register_ignores_requested_admin_role(self):
+        r = client.post("/v1/auth/register", json={
+            "email": "notadmin@churn.ai",
+            "full_name": "Not Admin",
+            "password": "pass123",
+            "role": "admin",
+        })
+        assert r.status_code == 201
+        assert r.json()["role"] == "analyst"
+
     def test_get_me(self):
         token = get_token()
         r = client.get("/v1/users/me", headers={"Authorization": f"Bearer {token}"})
@@ -121,3 +134,65 @@ class TestAnalytics:
         data = r.json()
         assert "total_customers" in data
         assert "churn_rate" in data
+
+
+class TestUpload:
+    def test_upload_parses_false_string_as_false(self):
+        token = get_token()
+        csv = "customer_id,monthly_charges,churn_label\nC001,10.0,False\n"
+        r = client.post(
+            "/v1/upload/churn-data",
+            files={"file": ("customers.csv", csv, "text/csv")},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert r.status_code == 200
+
+        db = TestingSessionLocal()
+        customer = db.query(Customer).filter(Customer.customer_id == "C001").first()
+        db.close()
+        assert customer is not None
+        assert customer.churn_label is False
+
+    def test_upload_rejects_invalid_boolean(self):
+        token = get_token()
+        csv = "customer_id,monthly_charges,churn_label\nC002,10.0,maybe\n"
+        r = client.post(
+            "/v1/upload/churn-data",
+            files={"file": ("customers.csv", csv, "text/csv")},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert r.status_code == 422
+
+
+class TestRecommendations:
+    def test_generate_recommendations_deduplicates_and_uses_probability(self):
+        token = get_token()
+        db = TestingSessionLocal()
+        db.add(Customer(
+            customer_id="REC001",
+            contract_type="Month-to-month",
+            monthly_charges=100.0,
+            predicted_ltv=1000.0,
+        ))
+        db.add(Prediction(
+            customer_id="REC001",
+            model_version="test",
+            churn_probability=0.8,
+            risk_score=0.8,
+            risk_category="high",
+        ))
+        db.commit()
+        db.close()
+
+        for _ in range(2):
+            r = client.post(
+                "/v1/recommendations/generate/REC001",
+                headers={"Authorization": f"Bearer {token}"},
+            )
+            assert r.status_code == 200
+
+        db = TestingSessionLocal()
+        recs = db.query(Recommendation).filter(Recommendation.customer_id == "REC001").all()
+        db.close()
+        assert len(recs) == 1
+        assert recs[0].estimated_revenue_saved == 200.0

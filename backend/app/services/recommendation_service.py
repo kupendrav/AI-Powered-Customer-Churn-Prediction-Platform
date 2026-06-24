@@ -88,25 +88,31 @@ class RecommendationService:
             .order_by(Prediction.created_at.desc())
             .first()
         )
-        prob = prediction.churn_probability if prediction else 0.5
+        prob = float(prediction.churn_probability) if prediction else 0.5
         monthly = float(customer.monthly_charges or 0)
         ltv = float(customer.predicted_ltv or monthly * 24)
 
         results = []
         for s in STRATEGIES:
             if s["trigger"](customer, prediction):
-                rev_saved = round(ltv * s["churn_reduction"], 2)
-                rec = Recommendation(
-                    customer_id=customer_id,
-                    strategy=s["strategy"],
-                    rationale=s["rationale"],
-                    priority=s["priority"],
-                    estimated_revenue_saved=rev_saved,
-                    estimated_churn_reduction=s["churn_reduction"],
-                    action_items=s["action_items"],
-                    status="pending",
+                rev_saved = round(ltv * prob * s["churn_reduction"], 2)
+                rec = (
+                    self.db.query(Recommendation)
+                    .filter(
+                        Recommendation.customer_id == customer_id,
+                        Recommendation.strategy == s["strategy"],
+                        Recommendation.status == "pending",
+                    )
+                    .first()
                 )
-                self.db.add(rec)
+                if rec is None:
+                    rec = Recommendation(customer_id=customer_id, strategy=s["strategy"], status="pending")
+                    self.db.add(rec)
+                rec.rationale = s["rationale"]
+                rec.priority = s["priority"]
+                rec.estimated_revenue_saved = rev_saved
+                rec.estimated_churn_reduction = s["churn_reduction"]
+                rec.action_items = s["action_items"]
                 results.append(rec)
 
         if not results:
@@ -120,7 +126,19 @@ class RecommendationService:
                 action_items=["Monthly health check", "Quarterly NPS survey"],
                 status="pending",
             )
-            self.db.add(rec)
+            existing = (
+                self.db.query(Recommendation)
+                .filter(
+                    Recommendation.customer_id == customer_id,
+                    Recommendation.strategy == rec.strategy,
+                    Recommendation.status == "pending",
+                )
+                .first()
+            )
+            if existing:
+                rec = existing
+            else:
+                self.db.add(rec)
             results.append(rec)
 
         self.db.commit()

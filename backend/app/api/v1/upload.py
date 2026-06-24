@@ -11,6 +11,7 @@ from app.dependencies import require_analyst
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
+MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 
 
 @router.post("/churn-data")
@@ -23,7 +24,13 @@ async def upload_churn_data(
         raise HTTPException(status_code=400, detail="Only CSV files accepted")
 
     content = await file.read()
-    df = pd.read_csv(io.BytesIO(content))
+    if len(content) > MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=413, detail="CSV file is too large; maximum size is 10 MB")
+
+    try:
+        df = pd.read_csv(io.BytesIO(content))
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"Invalid CSV file: {exc}") from exc
 
     required_cols = {"customer_id", "monthly_charges", "churn_label"}
     missing = required_cols - set(df.columns)
@@ -58,10 +65,14 @@ async def upload_churn_data(
     def to_bool(value):
         if pd.isna(value):
             return None
-        try:
-            return bool(int(value))
-        except (TypeError, ValueError):
-            return bool(value)
+        if isinstance(value, bool):
+            return value
+        text = str(value).strip().lower()
+        if text in {"1", "true", "t", "yes", "y"}:
+            return True
+        if text in {"0", "false", "f", "no", "n"}:
+            return False
+        raise HTTPException(status_code=422, detail=f"Invalid boolean value for churn_label: {value}")
 
     ids = df["customer_id"].tolist()
     existing_ids: set[str] = set()
@@ -104,8 +115,13 @@ async def upload_churn_data(
         )
 
     if customers:
-        db.bulk_save_objects(customers)
-        db.commit()
+        try:
+            db.bulk_save_objects(customers)
+            db.commit()
+        except Exception as exc:
+            db.rollback()
+            logger.exception("Failed to persist uploaded customers")
+            raise HTTPException(status_code=500, detail="Failed to save uploaded customers") from exc
 
     inserted = len(customers)
     logger.info(f"Uploaded {inserted} new customers from {file.filename}")

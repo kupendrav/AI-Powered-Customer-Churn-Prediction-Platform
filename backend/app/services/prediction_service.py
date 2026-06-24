@@ -12,6 +12,7 @@ ARTIFACTS_PATH = os.environ.get("ML_ARTIFACTS_PATH", "./ml_artifacts")
 if not os.path.exists(ARTIFACTS_PATH) and os.path.exists("./ml/artifacts"):
     ARTIFACTS_PATH = "./ml/artifacts"
 MODEL_VERSION = "1.0.0"
+MODEL_METADATA: Dict[str, Any] = {"model_version": MODEL_VERSION, "requires_scaling": True}
 
 FEATURE_COLUMNS = [
     "age", "tenure_months", "monthly_charges", "total_spending",
@@ -30,6 +31,12 @@ FEATURE_COLUMNS_PATH = os.path.join(ARTIFACTS_PATH, "feature_columns.json")
 if os.path.exists(FEATURE_COLUMNS_PATH):
     with open(FEATURE_COLUMNS_PATH) as f:
         FEATURE_COLUMNS = json.load(f)
+
+MODEL_METADATA_PATH = os.path.join(ARTIFACTS_PATH, "model_metadata.json")
+if os.path.exists(MODEL_METADATA_PATH):
+    with open(MODEL_METADATA_PATH) as f:
+        MODEL_METADATA.update(json.load(f))
+MODEL_VERSION = str(MODEL_METADATA.get("model_version", MODEL_VERSION))
 
 
 def _safe_float(val, default=0.0):
@@ -152,14 +159,14 @@ class PredictionService:
         if self._model is not None:
             try:
                 df = self._engineer_features(data)
-                if self._scaler:
+                if self._scaler and MODEL_METADATA.get("requires_scaling", True):
                     arr = self._scaler.transform(df)
                 else:
                     arr = df.values
                 prob = float(self._model.predict_proba(arr)[0][1])
             except Exception as exc:
-                logger.warning(f"Model inference failed: {exc}; using heuristic")
-                prob = self._heuristic_predict(data)
+                logger.exception("Model inference failed")
+                raise RuntimeError("Model inference failed") from exc
         else:
             prob = self._heuristic_predict(data)
 

@@ -124,6 +124,8 @@ def train():
 
     all_metrics = []
     best_model = None
+    best_model_name = None
+    best_requires_scaling = False
     best_auc = 0.0
 
     # ── Random Forest ──────────────────────────────────────────────────────
@@ -133,7 +135,7 @@ def train():
     m = evaluate(rf, X_test, y_test, "RandomForest")
     all_metrics.append(m)
     if m["roc_auc"] > best_auc:
-        best_auc, best_model = m["roc_auc"], rf
+        best_auc, best_model, best_model_name, best_requires_scaling = m["roc_auc"], rf, "RandomForest", False
 
     # ── XGBoost ────────────────────────────────────────────────────────────
     if HAS_XGB:
@@ -146,7 +148,7 @@ def train():
         m = evaluate(xgb_m, X_test_sc, y_test, "XGBoost")
         all_metrics.append(m)
         if m["roc_auc"] > best_auc:
-            best_auc, best_model = m["roc_auc"], xgb_m
+            best_auc, best_model, best_model_name, best_requires_scaling = m["roc_auc"], xgb_m, "XGBoost", True
 
     # ── LightGBM ───────────────────────────────────────────────────────────
     if HAS_LGB:
@@ -157,7 +159,7 @@ def train():
         m = evaluate(lgb_m, X_test_sc, y_test, "LightGBM")
         all_metrics.append(m)
         if m["roc_auc"] > best_auc:
-            best_auc, best_model = m["roc_auc"], lgb_m
+            best_auc, best_model, best_model_name, best_requires_scaling = m["roc_auc"], lgb_m, "LightGBM", True
 
     # ── Logistic Regression ────────────────────────────────────────────────
     logger.info("Training Logistic Regression…")
@@ -166,7 +168,7 @@ def train():
     m = evaluate(lr, X_test_sc, y_test, "LogisticRegression")
     all_metrics.append(m)
     if m["roc_auc"] > best_auc:
-        best_auc, best_model = m["roc_auc"], lr
+        best_auc, best_model, best_model_name, best_requires_scaling = m["roc_auc"], lr, "LogisticRegression", True
 
     # ── Save best model ────────────────────────────────────────────────────
     logger.info(f"Best model AUC: {best_auc:.4f}")
@@ -175,6 +177,7 @@ def train():
     scaler_path = ARTIFACTS_DIR / "scaler.pkl"
     cols_path = ARTIFACTS_DIR / "feature_columns.json"
     metrics_path = ARTIFACTS_DIR / "metrics.json"
+    metadata_path = ARTIFACTS_DIR / "model_metadata.json"
 
     joblib.dump(best_model, model_path)
     joblib.dump(scaler, scaler_path)
@@ -186,6 +189,15 @@ def train():
     best_metrics["model_version"] = "1.0.0"
     with open(metrics_path, "w") as f:
         json.dump(best_metrics, f, indent=2)
+
+    with open(metadata_path, "w") as f:
+        json.dump({
+            "model_version": "1.0.0",
+            "model_name": best_model_name,
+            "requires_scaling": best_requires_scaling,
+            "risk_thresholds": {"medium": 0.4, "high": 0.7},
+            "feature_count": len(feature_cols),
+        }, f, indent=2)
 
     logger.info(f"Artifacts saved to {ARTIFACTS_DIR}")
     logger.info("Training complete!")

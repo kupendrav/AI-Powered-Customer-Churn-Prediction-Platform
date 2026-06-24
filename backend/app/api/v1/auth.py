@@ -37,7 +37,9 @@ async def register(payload: UserCreate, db: Session = Depends(get_db)):
         email=payload.email,
         full_name=payload.full_name,
         password_hash=hash_password(payload.password),
-        role=payload.role,
+        # Public registration must never trust a client-supplied role.
+        # Elevated roles should be assigned only through an authenticated admin flow.
+        role=UserRole.analyst,
     )
     db.add(user)
     db.commit()
