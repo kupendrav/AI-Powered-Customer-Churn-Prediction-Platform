@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
 
     # Database
-    DATABASE_URL: str = "postgresql://postgres:password@localhost:5432/churn_db"
+    DATABASE_URL: str = "postgresql://postgres:36c871dd854aaf83baa4ef776e97fe39@shzt9f84.ap-southeast.database.insforge.app:5432/insforge?sslmode=require"
 
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func, cast, Integer, case
 
@@ -24,19 +24,25 @@ async def get_kpis(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    total = db.query(func.count(Customer.id)).scalar() or 0
-    churned = db.query(func.count(Customer.id)).filter(Customer.churn_label == True).scalar() or 0
-    churn_rate = round(churned / total * 100, 2) if total else 0.0
-
     risk_expr = _risk_expr()
-    at_risk = db.query(func.count(Customer.id)).filter(risk_expr >= 0.7).scalar() or 0
-    mrr_at_risk = db.query(func.sum(Customer.monthly_charges)).filter(risk_expr >= 0.7).scalar() or 0.0
-    avg_clv = db.query(func.avg(Customer.predicted_ltv)).scalar() or 0.0
-    avg_nps = db.query(func.avg(Customer.nps_score)).scalar() or 0.0
-
-    risk_high = db.query(func.count(Customer.id)).filter(risk_expr >= 0.7).scalar() or 0
-    risk_medium = db.query(func.count(Customer.id)).filter(risk_expr >= 0.4, risk_expr < 0.7).scalar() or 0
+    base = db.query(
+        func.count(Customer.id).label("total"),
+        func.count(Customer.id).filter(Customer.churn_label == True).label("churned"),
+        func.count(Customer.id).filter(risk_expr >= 0.7).label("risk_high"),
+        func.count(Customer.id).filter(risk_expr >= 0.4, risk_expr < 0.7).label("risk_medium"),
+        func.sum(Customer.monthly_charges).filter(risk_expr >= 0.7).label("mrr_at_risk"),
+        func.avg(Customer.predicted_ltv).label("avg_clv"),
+        func.avg(Customer.nps_score).label("avg_nps"),
+    ).one()
+    total = base.total or 0
+    churned = base.churned or 0
+    churn_rate = round(churned / total * 100, 2) if total else 0.0
+    risk_high = base.risk_high or 0
+    risk_medium = base.risk_medium or 0
     risk_low = max(total - risk_high - risk_medium, 0)
+    mrr_at_risk = float(base.mrr_at_risk or 0)
+    avg_clv = float(base.avg_clv or 0)
+    avg_nps = float(base.avg_nps or 0)
 
     if db.bind and db.bind.dialect.name == "sqlite":
         month_expr = func.strftime("%Y-%m", Customer.created_at)
@@ -96,9 +102,9 @@ async def churn_by_segment(
 
 @router.get("/customers")
 async def list_customers(
-    skip: int = 0,
-    limit: int = 50,
-    risk_min: float = 0.0,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
+    risk_min: float = Query(0.0, ge=0.0, le=1.0),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):

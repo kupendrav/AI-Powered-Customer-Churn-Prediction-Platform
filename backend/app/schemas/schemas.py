@@ -1,4 +1,5 @@
 from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import Field
 from typing import Optional
 from uuid import UUID
 from datetime import datetime
@@ -40,23 +41,23 @@ class UserResponse(BaseModel):
 # ── Prediction ────────────────────────────────────────────────────────────────
 class PredictionRequest(BaseModel):
     customer_id: str
-    age: Optional[int] = None
+    age: Optional[int] = Field(default=None, ge=0, le=120)
     gender: Optional[str] = None
     region: Optional[str] = None
     subscription_type: Optional[str] = None
     contract_type: Optional[str] = None
-    tenure_months: Optional[int] = None
-    monthly_charges: Optional[float] = None
-    total_spending: Optional[float] = None
+    tenure_months: Optional[int] = Field(default=None, ge=0, le=1200)
+    monthly_charges: Optional[float] = Field(default=None, ge=0)
+    total_spending: Optional[float] = Field(default=None, ge=0)
     payment_method: Optional[str] = None
-    login_frequency: Optional[float] = None
-    feature_usage_count: Optional[int] = None
-    session_time_avg: Optional[float] = None
-    last_login_days: Optional[int] = None
-    support_tickets: Optional[int] = None
-    complaint_count: Optional[int] = None
-    customer_satisfaction: Optional[float] = None
-    nps_score: Optional[int] = None
+    login_frequency: Optional[float] = Field(default=None, ge=0)
+    feature_usage_count: Optional[int] = Field(default=None, ge=0)
+    session_time_avg: Optional[float] = Field(default=None, ge=0)
+    last_login_days: Optional[int] = Field(default=None, ge=0)
+    support_tickets: Optional[int] = Field(default=None, ge=0)
+    complaint_count: Optional[int] = Field(default=None, ge=0)
+    customer_satisfaction: Optional[float] = Field(default=None, ge=0, le=5)
+    nps_score: Optional[int] = Field(default=None, ge=-10, le=10)
 
 
 class PredictionResponse(BaseModel):
