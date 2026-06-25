@@ -6,36 +6,8 @@ import logging
 
 from app.config import settings
 from app.api.router import api_router
-from app.db.session import engine, SessionLocal
-from app.db.base import Base
-from app.models.user import User, UserRole
-from app.core.security import hash_password
 from app.logging_config import setup_logging
 from prometheus_client import make_asgi_app
-def seed_default_users() -> None:
-    db = SessionLocal()
-    try:
-        if not db.query(User).filter(User.email == "admin@churn.ai").first():
-            admin = User(
-                email="admin@churn.ai",
-                full_name="Admin User",
-                password_hash=hash_password("admin123"),
-                role=UserRole.admin,
-            )
-            db.add(admin)
-
-        if not db.query(User).filter(User.email == "analyst@churn.ai").first():
-            analyst = User(
-                email="analyst@churn.ai",
-                full_name="Analyst User",
-                password_hash=hash_password("analyst123"),
-                role=UserRole.analyst,
-            )
-            db.add(analyst)
-
-        db.commit()
-    finally:
-        db.close()
 
 
 setup_logging()
@@ -45,8 +17,6 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Starting ChurnAI API...")
-    Base.metadata.create_all(bind=engine)
-    seed_default_users()
     yield
     logger.info("Shutting down ChurnAI API...")
 

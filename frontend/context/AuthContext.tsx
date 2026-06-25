@@ -1,7 +1,8 @@
 "use client";
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import Cookies from "js-cookie";
-import { getMe, login as apiLogin } from "@/services/api";
+import { getMe } from "@/services/api";
+import { insforge } from "@/lib/insforge/client";
+import { signInWithPassword, signOut as signOutAction } from "@/app/actions/auth";
 
 interface User { id: string; email: string; full_name: string; role: string; }
 interface AuthCtx {
@@ -18,23 +19,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = Cookies.get("token");
-    if (token) {
-      getMe().then(setUser).catch(() => Cookies.remove("token")).finally(() => setLoading(false));
-    } else {
-      setLoading(false);
+    let cancelled = false;
+
+    async function hydrateAuth() {
+      const { data, error } = await insforge.auth.getCurrentUser();
+      if (cancelled) return;
+
+      if (error || !data.user) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const me = await getMe();
+        if (!cancelled) setUser(me);
+      } catch {
+        if (!cancelled) {
+          setUser({
+            id: data.user.id,
+            email: data.user.email,
+            full_name: data.user.profile?.name ?? data.user.email,
+            role: "analyst",
+          });
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     }
+
+    void hydrateAuth();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const login = async (email: string, password: string) => {
-    const data = await apiLogin(email, password);
-    Cookies.set("token", data.access_token, { expires: 1 });
+    const result = await signInWithPassword(email, password);
+    if (result.error) throw new Error(result.error);
     const me = await getMe();
     setUser(me);
   };
 
-  const logout = () => {
-    Cookies.remove("token");
+  const logout = async () => {
+    await signOutAction();
     setUser(null);
     window.location.href = "/login";
   };

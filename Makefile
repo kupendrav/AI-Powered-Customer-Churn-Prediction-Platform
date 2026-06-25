@@ -13,7 +13,6 @@ build:
 	docker compose build
 
 seed:
-	docker compose exec backend python -m app.db.init_db
 	python datasets/dataset_generator.py
 
 train:
@@ -39,4 +38,4 @@ shell-backend:
 	docker compose exec backend bash
 
 shell-db:
-	docker compose exec db psql -U postgres churn_db
+	npx @insforge/cli db query "select now() as connected_at"

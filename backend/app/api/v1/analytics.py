@@ -39,6 +39,7 @@ async def get_kpis(
     churn_rate = round(churned / total * 100, 2) if total else 0.0
     risk_high = base.risk_high or 0
     risk_medium = base.risk_medium or 0
+    at_risk = risk_high + risk_medium
     risk_low = max(total - risk_high - risk_medium, 0)
     mrr_at_risk = float(base.mrr_at_risk or 0)
     avg_clv = float(base.avg_clv or 0)

@@ -9,7 +9,7 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = Cookies.get("token");
+  const token = Cookies.get("insforge_access_token");
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
@@ -18,7 +18,7 @@ api.interceptors.response.use(
   (r) => r,
   (err) => {
     if (err.response?.status === 401) {
-      Cookies.remove("token");
+      Cookies.remove("insforge_access_token");
       if (typeof window !== "undefined") window.location.href = "/login";
     }
     return Promise.reject(err);
@@ -26,12 +26,6 @@ api.interceptors.response.use(
 );
 
 // Auth
-export const login = (email: string, password: string) =>
-  api.post("/auth/login", { email, password }).then((r) => r.data);
-
-export const register = (email: string, full_name: string, password: string) =>
-  api.post("/auth/register", { email, full_name, password }).then((r) => r.data);
-
 export const getMe = () => api.get("/users/me").then((r) => r.data);
 
 // Analytics

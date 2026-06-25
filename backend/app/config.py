@@ -10,14 +10,17 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     LOG_LEVEL: str = "INFO"
 
-    # Database
-    DATABASE_URL: str = "postgresql://postgres:36c871dd854aaf83baa4ef776e97fe39@shzt9f84.ap-southeast.database.insforge.app:5432/insforge?sslmode=require"
+    # InsForge backend
+    INSFORGE_URL: str = "https://shzt9f84.ap-southeast.insforge.app"
+
+    # Database. Must be supplied by .env/.env.local/secret manager.
+    DATABASE_URL: str
 
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"
 
-    # Security
-    SECRET_KEY: str = "dev-secret-key-change-in-production"
+    # Legacy security settings kept only for old local test helpers.
+    SECRET_KEY: str = "dev-only-change-me"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 

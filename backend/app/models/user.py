@@ -1,6 +1,5 @@
-from sqlalchemy import Column, String, Boolean, Enum
+from sqlalchemy import Column, String, Boolean
 from sqlalchemy.dialects.postgresql import UUID
-import uuid
 import enum
 
 from app.db.base import Base, TimestampMixin
@@ -13,11 +12,10 @@ class UserRole(str, enum.Enum):
 
 
 class User(Base, TimestampMixin):
-    __tablename__ = "users"
+    __tablename__ = "user_profiles"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(as_uuid=True), primary_key=True)
     email = Column(String(255), unique=True, nullable=False, index=True)
     full_name = Column(String(255), nullable=False)
-    password_hash = Column(String(255), nullable=False)
-    role = Column(Enum(UserRole), default=UserRole.analyst, nullable=False)
+    role = Column(String(20), default=UserRole.analyst.value, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)

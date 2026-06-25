@@ -6,8 +6,8 @@ import toast from "react-hot-toast";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 
 function LoginForm() {
-  const [email, setEmail] = useState("admin@churn.ai");
-  const [password, setPassword] = useState("admin123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
@@ -52,9 +52,6 @@ function LoginForm() {
             Churn<span style={{ color: "var(--text-primary)" }}>AI</span>
           </div>
           <h1 style={{ fontSize: "1.25rem", fontWeight: 600, margin: 0 }}>Sign in to your account</h1>
-          <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", marginTop: 6 }}>
-            Default: admin@churn.ai / admin123
-          </p>
         </div>
 
         <div className="card">

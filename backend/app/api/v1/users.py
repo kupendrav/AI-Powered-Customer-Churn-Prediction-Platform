@@ -5,9 +5,8 @@ from uuid import UUID
 
 from app.db.session import get_db
 from app.models.user import User
-from app.schemas.schemas import UserResponse, UserCreate
+from app.schemas.schemas import UserResponse
 from app.dependencies import get_current_user, require_admin
-from app.core.security import hash_password
 
 router = APIRouter()
 

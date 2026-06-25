@@ -7,15 +7,16 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
+from uuid import uuid4
 
 from app.main import app
 from app.db.base import Base
 from app.db.session import get_db
+from app.dependencies import get_current_user
 from app.models.user import User, UserRole
 from app.models.customer import Customer
 from app.models.prediction import Prediction
 from app.models.recommendation import Recommendation
-from app.core.security import hash_password
 
 SQLALCHEMY_TEST_URL = "sqlite://"
 engine = create_engine(
@@ -37,15 +38,28 @@ def override_get_db():
 app.dependency_overrides[get_db] = override_get_db
 
 
+def override_current_user():
+    return User(
+        id=uuid4(),
+        email="test@churn.ai",
+        full_name="Test User",
+        role=UserRole.admin.value,
+        is_active=True,
+    )
+
+
+app.dependency_overrides[get_current_user] = override_current_user
+
+
 @pytest.fixture(autouse=True)
 def setup_db():
     Base.metadata.create_all(bind=engine)
     db = TestingSessionLocal()
     admin = User(
+        id=uuid4(),
         email="test@churn.ai",
         full_name="Test User",
-        password_hash=hash_password("testpass"),
-        role=UserRole.admin,
+        role=UserRole.admin.value,
     )
     db.add(admin)
     db.commit()
@@ -58,8 +72,7 @@ client = TestClient(app)
 
 
 def get_token():
-    r = client.post("/v1/auth/login", json={"email": "test@churn.ai", "password": "testpass"})
-    return r.json()["access_token"]
+    return "test-insforge-access-token"
 
 
 class TestHealth:
@@ -70,34 +83,15 @@ class TestHealth:
 
 
 class TestAuth:
-    def test_login_success(self):
+    def test_login_is_retired(self):
         r = client.post("/v1/auth/login", json={"email": "test@churn.ai", "password": "testpass"})
-        assert r.status_code == 200
-        assert "access_token" in r.json()
+        assert r.status_code == 410
 
-    def test_login_wrong_password(self):
-        r = client.post("/v1/auth/login", json={"email": "test@churn.ai", "password": "wrong"})
-        assert r.status_code == 401
-
-    def test_login_wrong_email(self):
-        r = client.post("/v1/auth/login", json={"email": "nobody@churn.ai", "password": "testpass"})
-        assert r.status_code == 401
-
-    def test_register(self):
+    def test_register_is_retired(self):
         r = client.post("/v1/auth/register", json={
             "email": "new@churn.ai", "full_name": "New User", "password": "pass123"
         })
-        assert r.status_code == 201
-
-    def test_register_ignores_requested_admin_role(self):
-        r = client.post("/v1/auth/register", json={
-            "email": "notadmin@churn.ai",
-            "full_name": "Not Admin",
-            "password": "pass123",
-            "role": "admin",
-        })
-        assert r.status_code == 201
-        assert r.json()["role"] == "analyst"
+        assert r.status_code == 410
 
     def test_get_me(self):
         token = get_token()

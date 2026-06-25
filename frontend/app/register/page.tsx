@@ -4,10 +4,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { register } from "@/services/api";
+import { signUpWithPassword, verifyEmailCode } from "@/app/actions/auth";
 
 export default function RegisterPage() {
   const [form, setForm] = useState({ email: "", full_name: "", password: "", confirm: "" });
+  const [verificationEmail, setVerificationEmail] = useState("");
+  const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -16,11 +18,32 @@ export default function RegisterPage() {
     if (form.password !== form.confirm) { toast.error("Passwords do not match"); return; }
     setLoading(true);
     try {
-      await register(form.email, form.full_name, form.password);
-      toast.success("Account created! Please sign in.");
+      const result = await signUpWithPassword(form.email, form.password, form.full_name);
+      if (result.error) throw new Error(result.error);
+      if (result.requireEmailVerification) {
+        setVerificationEmail(form.email);
+        toast.success("Check your email for the verification code.");
+        return;
+      }
+      toast.success("Account created!");
       router.push("/login");
     } catch (err: any) {
-      toast.error(err?.response?.data?.detail ?? "Registration failed");
+      toast.error(err?.message ?? "Registration failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const result = await verifyEmailCode(verificationEmail, otp);
+      if (result.error) throw new Error(result.error);
+      toast.success("Email verified. Welcome!");
+      router.push("/dashboard");
+    } catch (err: any) {
+      toast.error(err?.message ?? "Verification failed");
     } finally {
       setLoading(false);
     }
@@ -46,6 +69,29 @@ export default function RegisterPage() {
           <h1 style={{ fontSize: "1.25rem", fontWeight: 600, margin: 0 }}>Create an account</h1>
         </div>
         <div className="card">
+          {verificationEmail ? (
+          <form onSubmit={handleVerify} style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
+            <div>
+              <label style={lbl}>Verification Code</label>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                style={inp}
+                required
+              />
+            </div>
+            <button type="submit" disabled={loading} style={{
+              padding: "0.75rem", borderRadius: 8,
+              background: loading ? "var(--surface-border)" : "var(--brand)",
+              color: "#fff", border: "none", cursor: loading ? "not-allowed" : "pointer",
+              fontWeight: 500, fontSize: "0.9rem", fontFamily: "var(--font-sans)",
+            }}>
+              {loading ? "Verifying..." : "Verify email"}
+            </button>
+          </form>
+          ) : (
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
             {(["full_name", "email", "password", "confirm"] as const).map((field) => (
               <div key={field}>
@@ -64,9 +110,10 @@ export default function RegisterPage() {
               color: "#fff", border: "none", cursor: loading ? "not-allowed" : "pointer",
               fontWeight: 500, fontSize: "0.9rem", fontFamily: "var(--font-sans)",
             }}>
-              {loading ? "Creating…" : "Create account"}
+              {loading ? "Creating..." : "Create account"}
             </button>
           </form>
+          )}
           <p style={{ textAlign: "center", marginTop: "1rem", fontSize: "0.8rem", color: "var(--text-muted)" }}>
             Already have an account?{" "}
             <Link href="/login" style={{ color: "var(--brand-light)" }}>Sign in</Link>
